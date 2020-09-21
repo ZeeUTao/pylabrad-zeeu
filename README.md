@@ -20,7 +20,7 @@ If we still want to use the old servers, like grapher and registry.
 
   or according to https://github.com/ZeeUTao/scalabrad-web.
 
-  A simple way is download a pre-built binary package from https://bintray.com/labrad/generic/scalabrad-web, and run a startup script `/bin/labrad.bat`. 
+  A simple way is download a pre-built binary package from https://bintray.com/labrad/generic/scalabrad#files, and run a startup script `/bin/labrad.bat`. 
 
   > you may need to delete the environment variables defined for the old Delphi labrad manager
 
