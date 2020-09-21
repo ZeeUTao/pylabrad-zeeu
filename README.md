@@ -1,17 +1,95 @@
 # pylabrad
 
-[![PyPI](https://img.shields.io/pypi/v/pylabrad.svg)](https://pypi.python.org/pypi/pylabrad)
-[![Build Status](https://secure.travis-ci.org/labrad/pylabrad.png)](http://travis-ci.org/labrad/pylabrad)
-[![Coverage Status](https://coveralls.io/repos/labrad/pylabrad/badge.svg)](https://coveralls.io/r/labrad/pylabrad)
 
 pylabrad is an interface to the LabRAD system in python with support for both clients and servers.
 For general information about the LabRAD system/protocol see [the labrad repository](https://github.com/labrad/labrad) and associated [wiki](https://github.com/labrad/labrad/wiki).
 For help getting started and understanding pylabrad take a look at the [wiki](https://github.com/labrad/pylabrad/wiki).
 
+
+
 ## Manager Compatibility
 
 As of version 0.96.0, pylabrad is no longer compatible with the Delphi labrad manager available from Sourceforge.
 Instead, use the new [scalabrad manager](https://github.com/labrad/scalabrad).
+
+
+
+If we still want to use the old servers, like grapher and registry. 
+
+- run [scalabrad manager](https://github.com/labrad/scalabrad)
+
+  or according to https://github.com/ZeeUTao/scalabrad-web.
+
+  A simple way is download a pre-built binary package from https://bintray.com/labrad/generic/scalabrad-web, and run a startup script `/bin/labrad.bat`. 
+
+  > you may need to delete the environment variables defined for the old Delphi labrad manager
+
+- run the Delphi labrad manager. 
+
+  The host and port should be different from the scalabrad manager (localhost 7682), for example, you can use the port 7683. 
+  
+  ```
+  Port: 7683
+  Password: 
+  Registry: D:\Labrad\Registry
+  Auto-Run: yes
+  
+  + localhost
+  ```
+
+
+
+- import [pylabrad](https://github.com/ZeeUTao/pylabrad-zeeu), and test
+
+  ```python
+  import labrad
+  cxn=labrad.connect()
+  
+  # add delphi manager, managers_add(host,port,password)
+  cxn.auth.managers_add('localhost',7683,'')
+  
+  # this function show [(host,port,connected)]
+  # If success, it gives [('localhost', 7683, True)]
+  cxn.auth.managers()
+  ```
+
+
+
+
+- Then you can run the other server, for example, `0_data_vault.py`
+
+  run in ipython3 or cmd
+
+  ```
+  # run 0_data_vault.py
+  # or
+  # ipython3 0_data_vault.py
+  ```
+
+  remember to type `Enter` and input password and directories
+
+  
+
+  and test it 
+
+  ```
+  import labrad
+  cxn = labrad.connect()
+  dv = cxn.data_vault
+  ```
+
+  
+
+
+
+  
+
+
+
+
+
+
+
 The user interface for the manager and node along with the registry editor and grapher is now [web-based (scalabrad-web)](https://github.com/labrad/scalabrad-web).
 
 ## Node Server
