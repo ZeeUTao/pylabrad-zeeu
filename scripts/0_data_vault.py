@@ -41,15 +41,10 @@ from twisted.internet.defer import inlineCallbacks
 from configparser import ConfigParser
 import os, re
 from datetime import datetime
+import numpy
 
-try:
-    import numpy
-    print("Numpy imported.")
-    useNumpy = True
-except ImportError as e:
-    print(e)
-    print("Numpy not imported.  The DataVault will operate, but will be slower.")
-    useNumpy = False
+useNumpy = True
+
 
 
 # TODO: tagging
@@ -745,7 +740,7 @@ class NumpyDataset(Dataset):
         
     def addData(self, data):
         varcount = len(self.independents) + len(self.dependents)
-        data = data.asarray
+        data = numpy.asarray(data)
         
         # reshape single row
         if len(data.shape) == 1:
