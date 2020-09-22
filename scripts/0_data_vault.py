@@ -490,7 +490,15 @@ class Dataset:
             sec = 'Parameter %d' % (i+1)
             label = S.get(sec, 'Label', raw=True)
             # TODO: big security hole! eval can execute arbitrary code
-            data = T.evalLRData(S.get(sec, 'Data', raw=True))
+            getS = S.get(sec, 'Data', raw=True)
+            # python3 has no long type
+            if getS[-1] is 'L':
+                try:
+                    eval(getS[:-1])
+                except:pass
+                else:
+                    getS=getS[:-1]
+            data = T.evalLRData(getS)
             return dict(label=label, data=data)
         count = S.getint(gen, 'Parameters')
         self.parameters = [getPar(i) for i in range(count)]
@@ -562,7 +570,10 @@ class Dataset:
         if it has not accessed for a while.
         """
         if not hasattr(self, '_file'):
-            self._file = open(self.datafile, 'a+') # append data
+            if not os.path.exists(self.datafile):
+                file = open(self.datafile, 'w')
+                file.close()
+            self._file = open(self.datafile, 'r+') 
             self._fileTimeoutCall = callLater(FILE_TIMEOUT, self._fileTimeout)
         else:
             self._fileTimeoutCall.reset(FILE_TIMEOUT)

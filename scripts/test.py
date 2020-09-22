@@ -33,5 +33,3 @@ for i in range(len(xs)):
     dv.add(data)
     time.sleep(0.1)
 
-# 结束了要close掉，删除缓存    
-# dv.close()
