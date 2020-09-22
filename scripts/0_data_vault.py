@@ -31,6 +31,7 @@ timeout = 5
 """
 
 
+from __future__ import with_statement
 
 from labrad import types as T, util
 from labrad.server import LabradServer, Signal, setting
@@ -46,7 +47,28 @@ import numpy
 useNumpy = True
 
 
+import os
 
+
+class ConfigFile(object):
+    """Wrapper for configuration files."""
+    
+    def __init__(self, name, path):
+        if not name.endswith('.ini'):
+            name += '.ini'
+        self.name = name
+        self.fname = os.path.join(path, name)
+        self.parser = ConfigParser()
+        with open(self.fname) as f:
+            self.parser.read_file(f)
+    def save():
+        with open(self.fname, 'w') as f:
+            self.parser.write(f)
+        
+    def __getattr__(self, key):
+        """Delegate everything else to the config parser."""
+        return getattr(self.parser, key)
+        
 # TODO: tagging
 # - search globally (or in some subtree of sessions) for matching tags
 #     - this is the least common case, and will be an expensive operation
@@ -56,7 +78,10 @@ useNumpy = True
 
 
 # location of repository will get loaded from the registry
-DATADIR = None
+cf = ConfigFile('data_vault', os.getcwd())
+DATADIR = cf.get('config', 'repository')
+print(DATADIR)
+
 
 PRECISION = 12 # digits of precision to use when saving data
 DATA_FORMAT = '%%.%dG' % PRECISION
@@ -797,7 +822,7 @@ class DataVault(LabradServer):
     @inlineCallbacks
     def initServer(self):
         # load configuration info from registry
-        global DATADIR
+        # global DATADIR
         try:
             path = ['', 'Servers', self.name, 'Repository']
             nodename = util.getNodeName()
@@ -814,7 +839,7 @@ class DataVault(LabradServer):
                 p.cd(path)
                 p.get('__default__', 's')
                 ans = yield p.send()
-            DATADIR = ans.get
+            # DATADIR = ans.get
             gotLocation = True
         except:
             try:
