@@ -79,14 +79,8 @@ If we still want to use the old servers, like grapher and registry.
   ```
 
   
-  
-  load the old delphi registry in scalabrad, run the followings in `scalabrad-0.x.x\bin`
-  
-  ```
-  labrad --registry file:///D:/Labrad/Tao_Lab/Registry?format=delphi
-  ```
-  
-  
+
+
 
   
 

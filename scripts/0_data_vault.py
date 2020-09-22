@@ -1,4 +1,3 @@
-
 # Copyright (C) 2007  Matthew Neeley
 #
 # This program is free software: you can redistribute it and/or modify
@@ -351,7 +350,7 @@ class Session(object):
         self.modified = datetime.now()
 
         name = '%05d - %s' % (num, title)
-        dataset = Dataset(self, name, create=True, title=title)
+        dataset = Dataset(self, name, title, create=True)
         for i in independents:
             dataset.addIndependent(i)
         for d in dependents:
@@ -384,7 +383,7 @@ class Session(object):
             dataset.access()
         else:
             # need to create a new wrapper for this dataset
-            dataset = Dataset(self, name,create=False)
+            dataset = Dataset(self, name)
             self.datasets[name] = dataset
         self.access()
         
@@ -437,13 +436,13 @@ class Session(object):
         return sessTags, dataTags
 
 class Dataset:
-    def __init__(self, session, name, create, title=None, num=None):
+    def __init__(self, session, name, title=None, num=None, create=False):
         self.parent = session.parent
         self.name = name
         file_base = os.path.join(session.dir, dsEncode(name))
         self.datafile = file_base + '.csv'
         self.infofile = file_base + '.ini'
-        # self.file() # create the datafile, but don't do anything with it
+        self.file # create the datafile, but don't do anything with it
         self.listeners = set() # contexts that want to hear about added data
         self.param_listeners = set()
         self.comment_listeners = set()
@@ -491,16 +490,7 @@ class Dataset:
             sec = 'Parameter %d' % (i+1)
             label = S.get(sec, 'Label', raw=True)
             # TODO: big security hole! eval can execute arbitrary code
-            getS = S.get(sec, 'Data', raw=True)
-            # python3 has no long type
-            if getS[-1] is 'L':
-                try:
-                    eval(getS[:-1])
-                except:pass
-                else:
-                    getS=getS[:-1]
-                
-            data = T.evalLRData(getS)
+            data = T.evalLRData(S.get(sec, 'Data', raw=True))
             return dict(label=label, data=data)
         count = S.getint(gen, 'Parameters')
         self.parameters = [getPar(i) for i in range(count)]
@@ -572,16 +562,12 @@ class Dataset:
         if it has not accessed for a while.
         """
         if not hasattr(self, '_file'):
-            if not os.path.exists(self.datafile):
-                file = open(self.datafile, 'w')
-                file.close()
-            self._file = open(self.datafile, 'r+') # append data
+            self._file = open(self.datafile, 'a+') # append data
             self._fileTimeoutCall = callLater(FILE_TIMEOUT, self._fileTimeout)
         else:
             self._fileTimeoutCall.reset(FILE_TIMEOUT)
         return self._file
-    
-    
+        
     def _fileTimeout(self):
         self._file.close()
         del self._file
@@ -732,6 +718,7 @@ class Dataset:
         
 
 class NumpyDataset(Dataset):
+
     def _get_data(self):
         """Read data from file on demand.
         
@@ -743,7 +730,7 @@ class NumpyDataset(Dataset):
                 # will be the case.  Even if the file exists on disk, we must
                 # check its size
                 if self._fileSize() > 0:
-                    self._data = numpy.loadtxt(self.file,encoding='utf-8', delimiter=',')
+                    self._data = numpy.loadtxt(self.file, delimiter=',')
                 else:
                     self._data = numpy.array([[]])
                 if len(self._data.shape) == 1:
