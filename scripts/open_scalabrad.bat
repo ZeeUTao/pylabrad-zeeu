@@ -1,0 +1,1 @@
+D:\Labrad\Tao_Lab\pylabrad3-zeeu\scalabrad-0.8.3\scalabrad-0.8.3\bin\labrad --registry file:///D:/Labrad/Tao_Lab/Registry?format=delphi

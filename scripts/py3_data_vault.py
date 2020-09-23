@@ -34,6 +34,9 @@ timeout = 5
 from __future__ import with_statement
 
 from labrad import types as T, util
+from labrad.units import Value,ValueArray,Complex,DimensionlessArray
+from numpy import array
+
 from labrad.server import LabradServer, Signal, setting
 
 from twisted.internet.reactor import callLater
@@ -49,7 +52,8 @@ useNumpy = True
 
 import os
 
-
+    
+    
 class ConfigFile(object):
     """Wrapper for configuration files."""
     
@@ -502,10 +506,8 @@ class Dataset:
                 except:pass
                 else:
                     getS=getS[:-1]
-            # 2. Delphi do not support the class 
-            if re.match("^DimensionlessArray\(.*\)$",getS) is not None:
-                getS = getS[len('DimensionlessArray')+1:-1]           
-            data = T.evalLRData(getS)
+            # change into eval
+            data = eval(getS)
             return dict(label=label, data=data)
         count = S.getint(gen, 'Parameters')
         self.parameters = [getPar(i) for i in range(count)]
