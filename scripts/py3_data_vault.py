@@ -490,14 +490,21 @@ class Dataset:
             sec = 'Parameter %d' % (i+1)
             label = S.get(sec, 'Label', raw=True)
             # TODO: big security hole! eval can execute arbitrary code
+            
             getS = S.get(sec, 'Data', raw=True)
-            # python3 has no long type
+            
+            # fix the bug in the delphi grapher and registry 
+            # due to the python3 pylabrad 
+            # 1. python3 has no long type
             if getS[-1] is 'L':
                 try:
                     eval(getS[:-1])
                 except:pass
                 else:
                     getS=getS[:-1]
+            # 2. Delphi do not support the class 
+            if re.match("^DimensionlessArray\(.*\)$",getS) is not None:
+                getS = getS[len('DimensionlessArray')+1:-1]           
             data = T.evalLRData(getS)
             return dict(label=label, data=data)
         count = S.getint(gen, 'Parameters')
