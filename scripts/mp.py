@@ -63,7 +63,7 @@ def dataset_create(dv,dataset):
 
 
         
-def s21_scan(sample,freq = ar[1.:6.:0.01],power = -38.0*dBm,zpa =0.0,name = 'S21',des='',
+def s21_scan(sample,freq = ar[1.:6.:0.01,GHz],power = st.r[-1:-30:1,dBm],zpa =0.0,name = 'S21',des='',
     measure=0,stats = 300,save=True):
     
     # load qubits 
@@ -71,7 +71,7 @@ def s21_scan(sample,freq = ar[1.:6.:0.01],power = -38.0*dBm,zpa =0.0,name = 'S21
     q = qubits[measure]
     
     # user input the parameters
-    axes = [(freq, 'Frequency'),(power,'power amplitude'),(zpa,'z pulse amplitude')]
+    axes = [(freq, 'GHz'),(power,'dBm'),(zpa,'')]
     deps = []
     deps.append(('I','',''))
     deps.append(('Q','',''))
@@ -94,17 +94,28 @@ def s21_scan(sample,freq = ar[1.:6.:0.01],power = -38.0*dBm,zpa =0.0,name = 'S21
         I,Q = np.sin(10*x)+0.2,np.cos(10*x)
         return np.array([I,Q])  
 
-
+    def transUnit(args):
+        args_new = []
+        for a in args:
+            if type(a) is not Value:
+                args_new.append(a)
+            else:
+                args_new.append(a[a.unit])      
+        return args_new
+        
     for axes_scan in gridSweep(axes):
         (freq,power,zpa) = axes_scan[0]
-        indeps_scan = axes_scan[1]
         
-        data = runQ(freq)
+        data = runQ(freq[freq.unit])
         I = data[0]
         Q = data[1]
         amp = np.abs(I+1j*Q)
         phase = np.angle(I+1j*Q)
-        data_deps = (I,Q,amp,phase)
+        data_deps = [I,Q,amp,phase]
+        
+        indeps_scan = axes_scan[1]
+        indeps_scan = transUnit(indeps_scan)
+        
         data_send = indeps_scan + data_deps
         
         print(data_send)

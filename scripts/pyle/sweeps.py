@@ -4,7 +4,7 @@ import pyle
 from pyle.pipeline import pmap, returnValue
 from pyle.util import getch
 from pyle.datasaver import Dataset
-from pyle.device.sequencer import QubitSequencer
+
 
 def prepDataset(sample, name, axes=None, dependents=None, measure=None, kw=None):
     """Prepare dataset for a sweep.
